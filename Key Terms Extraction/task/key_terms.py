@@ -1,5 +1,12 @@
 from collections import OrderedDict
 import nltk
+from nltk.corpus import stopwords
+from string import punctuation
+from nltk import WordNetLemmatizer
+
+
+nltk.download('stopwords')
+nltk.download('wordnet')
 
 file = open('news.xml', 'r')  # Opening XML file to reading
 is_text_reading = False  # Flag to remember text reading state
@@ -19,26 +26,44 @@ for line in file:
         is_text_reading = True
 
     if is_text_reading:
-        if '</value>' in line:
+        if '</value>' in line:  # Calculating statistics below
             text += line.removesuffix('</value>\n')
             is_text_reading = False
             for token in nltk.tokenize.word_tokenize(text.lower()):
-                frequency_dict.setdefault(head, {})  # Setting empty dictionary as default
-                buffer_dict = frequency_dict[head]  # Reading previous frequency data for current token
-                buffer_dict.setdefault(token, 0)  # Setting 0 count as default for token
-                buffer_dict[token] += 1  # Calculating appearance frequency for current tail
-                frequency_dict[head] = buffer_dict
-            text_list = nltk.tokenize.word_tokenize(text.lower())
+                # Flags for remember if a current element is stopword or punctuation symbol
+                bool_stopword = False
+                bool_punctuation = False
+                lemmatizer = WordNetLemmatizer()
+                token = lemmatizer.lemmatize(token)
+
+                # Checking on stopwords and punctuations
+                if token in stopwords.words('english'):
+                    bool_stopword = True
+                if token in list(punctuation):
+                    bool_punctuation = True
+
+                if bool_punctuation or bool_stopword:  # If something was found
+                    pass  # Do nothing
+                else:  # Add the current element to an answer
+                    frequency_dict.setdefault(head, {})  # Setting empty dictionary as default
+                    buffer_dict = frequency_dict[head]  # Reading previous frequency data for current token
+                    buffer_dict.setdefault(token, 0)  # Setting 0 count as default for token
+                    buffer_dict[token] += 1  # Calculating appearance frequency for current tail
+                    frequency_dict[head] = buffer_dict
+
             # Hand-made sorting algorithm
-            frequency_dict[head] = OrderedDict(sorted(frequency_dict[head].items(), reverse=True))
+            # frequency_dict[head] = OrderedDict(sorted(frequency_dict[head].items(), reverse=True))
+            frequency_dict[head] = dict(sorted(frequency_dict[head].items(), reverse=True))
             answer_dict = {}
             max_value = max(frequency_dict[head].values())
+            # print(max_value)
             while len(answer_dict) < 5:
                 for x in frequency_dict[head].items():
                     if x[1] == max_value:
-                        answer_dict[x[0]] = x[1]
+                        answer_dict[x[0]] = x[1]  # Add the current element to an answer
                 max_value -= 1
             print(*[*answer_dict][:5])
+            # print(frequency_dict[head])
         else:
             string = line.removeprefix('      <value name="text">')
             string = string.removeprefix('          ')
