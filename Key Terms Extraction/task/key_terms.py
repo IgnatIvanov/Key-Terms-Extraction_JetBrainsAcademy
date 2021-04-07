@@ -7,6 +7,7 @@ from nltk import WordNetLemmatizer
 
 nltk.download('stopwords')
 nltk.download('wordnet')
+nltk.download('averaged_perceptron_tagger')
 
 file = open('news.xml', 'r')  # Opening XML file to reading
 is_text_reading = False  # Flag to remember text reading state
@@ -33,6 +34,7 @@ for line in file:
                 # Flags for remember if a current element is stopword or punctuation symbol
                 bool_stopword = False
                 bool_punctuation = False
+                bool_not_noun = False
                 lemmatizer = WordNetLemmatizer()
                 token = lemmatizer.lemmatize(token)
 
@@ -41,8 +43,12 @@ for line in file:
                     bool_stopword = True
                 if token in list(punctuation):
                     bool_punctuation = True
+                # print(*nltk.pos_tag([token]))
+                # print([token])
+                if nltk.pos_tag([token])[0][1] != 'NN':
+                    bool_not_noun = True
 
-                if bool_punctuation or bool_stopword:  # If something was found
+                if bool_punctuation or bool_stopword or bool_not_noun:  # If something was found
                     pass  # Do nothing
                 else:  # Add the current element to an answer
                     frequency_dict.setdefault(head, {})  # Setting empty dictionary as default
