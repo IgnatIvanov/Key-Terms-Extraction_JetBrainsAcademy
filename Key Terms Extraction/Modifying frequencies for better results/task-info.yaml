@@ -460,5 +460,8 @@ files:
         KTETest().run_tests()
   learner_created: false
 feedback_link: https://hyperskill.org/projects/166/stages/863/implement#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Congratulations!
+  time: Sat, 10 Apr 2021 13:21:45 UTC
 record: -1
