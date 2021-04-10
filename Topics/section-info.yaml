@@ -2,3 +2,5 @@ content:
 - Loop control statements
 - POS tagging
 - Text normalization
+- Sep and end arguments of print
+- Math magic methods
